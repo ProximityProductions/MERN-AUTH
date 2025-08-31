@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../Components/Context/UserContext.jsx";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function SignUpPage() {
+  const { backendUrl, setIsLoggedIn, getUserData } = useContext(UserContext);
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -19,15 +25,28 @@ export default function SignUpPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      axios.defaults.withCredentials = true;
+      const { data } = await axios.post(`${backendUrl}/api/auth/register`, formData);
+      
+      if (data.success) {
+        setIsLoggedIn(true);
+        getUserData();
+        navigate("/");
+        toast.success("Account created successfully!");
+      } else {
+        toast.error(data.message || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      console.log("Signup Data:", formData);
-    }, 2000);
+    }
   };
 
   return (
@@ -85,6 +104,7 @@ export default function SignUpPage() {
                 onChange={handleInputChange}
                 className="w-full pl-10 pr-12 py-3 bg-white/20 border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-400 focus:bg-white/30"
                 required
+                minLength={6}
               />
               <button
                 type="button"
@@ -100,7 +120,7 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Creating..." : "Sign Up"}
           </button>
