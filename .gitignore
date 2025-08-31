@@ -1,11 +1,24 @@
-# Node
-node_modules/
-npm-debug.log
-yarn-error.log
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.env
+node_modules
+dist
+dist-ssr
+*.local
 
-# Env
-client/.env
-server/.env
-
-# Build
-client/dist/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
